@@ -1,0 +1,43 @@
+{{define "profile.html"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Username}} - Literary Lions</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playwrite+RO:wght@100..400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/bookicon.png" />
+  </head>
+  <body>
+    {{ template "elements/header.html" . }}
+    <main>
+      <div class="container">
+        <div class="content">
+          <div class="profile-header">
+            <h1>{{.Username}}</h1>
+            <p class="join-date">Member since {{.JoinDate}}</p>
+          </div>
+
+          {{if .Bio}}
+          <div class="profile-section">
+            <h3>About</h3>
+            <p class="bio">{{.Bio}}</p>
+          </div>
+          {{end}} {{if .IsOwnProfile}}
+          <div class="profile-actions">
+            <a href="/profile/edit" class="btn btn-secondary">Edit Profile</a>
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </main>
+    {{ template "elements/footer.html" . }}
+  </body>
+</html>
+{{end}}

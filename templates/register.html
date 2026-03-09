@@ -1,0 +1,144 @@
+{{define "register.html"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Literary Lions</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playwrite+RO:wght@100..400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/bookicon.png" />
+  </head>
+  <body>
+    {{ template "elements/header.html" . }}
+    <main>
+      <div class="container">
+        <div class="auth-container">
+          <div class="auth-form">
+            <h1>Join the Literary Lions</h1>
+            <p class="auth-subtitle">
+              Create your account and start a roaring discussion with fellow
+              lions/lionesses!
+            </p>
+
+            {{if .Error}}
+            <div class="error-message">{{.Error}}</div>
+            {{end}} {{if .Success}}
+            <div class="success-message">{{.Success}}</div>
+            {{end}}
+
+            <form action="/register" method="post" class="register-form">
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value="{{.Username}}"
+                  placeholder="Choose a unique username"
+                  required
+                  minlength="3"
+                  maxlength="20"
+                />
+                <small class="form-help"
+                  >3-20 characters, letters and numbers only</small
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value="{{.Email}}"
+                  placeholder="your.email@example.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Create a strong password"
+                  required
+                  minlength="8"
+                />
+                <small class="form-help">At least 8 characters</small>
+              </div>
+
+              <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirm-password"
+                  name="confirm_password"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="gender">Are you a...? (Optional)</label>
+                <select id="gender" name="gender">
+                  <option value="">Select your identity...</option>
+                  <option value="male">Lion</option>
+                  <option value="female">Lioness</option>
+                  <option value="nonbinary">Li-nonbinary</option>
+                  <option value="unspecified">
+                    Hidden lion - Prefer not to say
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="favorite-genre">Favorite Genre (Optional)</label>
+                <select id="favorite-genre" name="favorite_genre">
+                  <option value="">Select a genre...</option>
+                  <option value="fiction">Fiction</option>
+                  <option value="mystery">Mystery</option>
+                  <option value="romance">Romance</option>
+                  <option value="sci-fi">Science Fiction</option>
+                  <option value="fantasy">Fantasy</option>
+                  <option value="non-fiction">Non-Fiction</option>
+                  <option value="biography">Biography</option>
+                  <option value="history">History</option>
+                  <option value="poetry">Poetry</option>
+                  <option value="young-adult">Young Adult</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-group checkbox-group">
+                <input type="checkbox" id="terms" name="terms" required />
+                <label for="terms">
+                  I agree to the
+                  <a href="/terms" target="_blank">Terms of Service</a> and
+                  <a href="/privacy" target="_blank">Privacy Policy</a>
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-full">
+                Create Account
+              </button>
+            </form>
+
+            <div class="auth-footer">
+              <p>Already have an account? <a href="/login">Sign in here</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    {{ template "elements/footer.html" . }}
+  </body>
+</html>
+{{end}}

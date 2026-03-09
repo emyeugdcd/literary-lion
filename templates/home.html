@@ -1,0 +1,139 @@
+{{define "home.html"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Literary Lions</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/homepage.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playwrite+RO:wght@100..400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/bookicon.png" />
+  </head>
+  <body>
+    {{ template "elements/header.html" . }}
+    <main>
+      <!-- Authentication Banner for non-logged in users -->
+      {{if not .IsAuthenticated}}
+      <div class="auth-banner">
+        <div class="auth-content">
+          <h2>Join the Literary Lions Community!</h2>
+          <p>
+            Connect with fellow book lovers, share your thoughts, and discover
+            your next great read.
+          </p>
+          <div class="auth-buttons">
+            <a href="/register" class="btn btn-primary">Register</a>
+            <a href="/login" class="btn btn-secondary">Log In</a>
+            <a href="/posts" class="btn btn-primary">What's roaring?</a>
+          </div>
+        </div>
+      </div>
+      {{end}}
+
+      <div class="slideshow-container">
+        <input type="radio" name="slide" id="slide1" checked hidden />
+        <input type="radio" name="slide" id="slide2" hidden />
+        <input type="radio" name="slide" id="slide3" hidden />
+        <div class="slides">
+          <div class="slide">
+            <a href="/post/11">
+              <img src="../images/slide1.png" alt="Photo 1" />
+            </a>
+          </div>
+          <div class="slide">
+            <a href="/post/9">
+              <img src="../images/slide2.jpg" alt="Photo 2" />
+            </a>
+          </div>
+          <div class="slide">
+            <a href="/post/10">
+              <img src="../images/slide3.png" alt="Photo 3" />
+            </a>
+          </div>
+        </div>
+        <div class="controls">
+          <label for="slide1"></label>
+          <label for="slide2"></label>
+          <label for="slide3"></label>
+        </div>
+      </div>
+      <div class="container">
+        <div class="search-container-main">
+          <form action="/search" method="get">
+            <div class="input-container-main">
+              <input
+                type="text"
+                id="search"
+                name="search"
+                placeholder="Search for a discussion..."
+                required
+              />
+              <button type="submit" class="search-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="content">
+          <h1>Welcome to Lions' Library</h1>
+          <p>
+            Join other lions and lionesses, and discover a world of books,
+            authors, and literary treasures. Whether you're looking for the
+            latest bestseller or a timeless classic, we've got the perfect
+            thread waiting for you so you can roar with excitement. {{if not
+            .IsAuthenticated}}
+            <strong
+              ><a href="/register"
+                >Join the discussion by registering!</a
+              ></strong
+            >
+            {{else}} Join the discussion! {{end}}
+          </p>
+          <p>
+            Curl up with a cozy read and let our collection ignite your love for
+            stories. Browse threads to see what others are reading, or what the
+            hottest book of the month is and so much more!
+          </p>
+
+          {{if not .IsAuthenticated}}
+          <div class="call-to-action">
+            <h3>Ready to start your literary journey?</h3>
+            <p>
+              Create an account to post discussions, comment on books, and
+              connect with readers worldwide.
+            </p>
+            <div class="cta-buttons">
+              <a href="/register" class="btn btn-primary">Get Started</a>
+              <span
+                >Already have an account?
+                <a href="/login">Sign in here</a></span
+              >
+            </div>
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </main>
+    {{ template "elements/footer.html" . }}
+  </body>
+</html>
+{{end}}

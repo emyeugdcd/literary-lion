@@ -1,0 +1,10 @@
+.git
+*.md
+*.drawio
+*.DS_Store
+*.swp
+*.swo
+*.log
+*.test
+node_modules
+vendor

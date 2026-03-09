@@ -1,0 +1,203 @@
+{{define "posts.html"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Discussions - Literary Lions</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playwrite+RO:wght@100..400&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/images/bookicon.png">
+    <style>
+        .posts-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .post-card { border: 1px solid #ddd; margin-bottom: 20px; padding: 20px; border-radius: 5px; }
+        .post-meta { color: #666; font-size: 0.9em; margin-bottom: 10px; }
+        .post-excerpt { margin: 15px 0; line-height: 1.6; }
+        .post-footer { display: flex; justify-content: space-between; margin-top: 15px; }
+        .categories a { margin-right: 10px; color: #007bff; text-decoration: none; }
+        .stats span { margin-right: 15px; }
+    </style>
+</head>
+<body>
+    {{ template "elements/header.html" . }}
+    <main>
+        <div class="container">
+            <div class="posts-header">
+                <h1>Literary Discussions</h1>
+                {{if .TotalCount}}
+                <p class="posts-count">{{.TotalCount}} posts found</p>
+                {{end}}
+                <div class="posts-controls">
+                    {{if .IsAuthenticated}}
+                    <a href="/createpost" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        New Discussion
+                    </a>
+                    {{end}}
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <a href="/posts?page=1" class="filter-tab {{if eq .Filter "all"}}active{{end}}">All Posts</a>
+                    <a href="/posts?filter=hot&page=1" class="filter-tab {{if eq .Filter "hot"}}active{{end}}">Hot</a>
+                    <a href="/posts?filter=recent&page=1" class="filter-tab {{if eq .Filter "recent"}}active{{end}}">Recent</a>
+                    {{if .IsAuthenticated}}
+                    <a href="/posts?filter=my&page=1" class="filter-tab {{if eq .Filter "my"}}active{{end}}">My Posts</a>
+                    <a href="/posts?filter=liked&page=1" class="filter-tab {{if eq .Filter "liked"}}active{{end}}">Liked</a>
+                    {{end}}
+                </div>
+
+                <div class="filter-category">
+                    <select id="category-filter" onchange="filterByCategory(this.value)">
+                        <option value="">All Categories</option>
+                        <option value="book-review" {{if eq .CategoryFilter "book-review"}}selected{{end}}>Book Review</option>
+                        <option value="book-recommendation" {{if eq .CategoryFilter "book-recommendation"}}selected{{end}}>Book Recommendation</option>
+                        <option value="author-discussion" {{if eq .CategoryFilter "author-discussion"}}selected{{end}}>Author Discussion</option>
+                        <option value="reading-challenge" {{if eq .CategoryFilter "reading-challenge"}}selected{{end}}>Reading Challenge</option>
+                        <option value="book-club" {{if eq .CategoryFilter "book-club"}}selected{{end}}>Book Club</option>
+                        <option value="writing-tips" {{if eq .CategoryFilter "writing-tips"}}selected{{end}}>Writing Tips</option>
+                        <option value="genre-discussion" {{if eq .CategoryFilter "genre-discussion"}}selected{{end}}>Genre Discussion</option>
+                        <option value="general" {{if eq .CategoryFilter "general"}}selected{{end}}>General Discussion</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Posts List -->
+            <div class="posts-list">
+                {{range .Posts}}
+                <article class="post-card">
+                    <div class="post-card-header">
+                        <span class="category-badge category-{{.Category}}">{{.CategoryName}}</span>
+                        <div class="post-meta">
+                            <span class="post-author">{{.Username}}</span>
+                            <span class="post-date">{{.CreatedAt.Format "Jan 2, 2006"}}</span>
+                        </div>
+                    </div>
+                    
+                    <h2 class="post-title">
+                        <a href="/post/{{.ID}}">{{.Title}}</a>
+                    </h2>
+                    
+                    <div class="post-excerpt">
+                        {{.ContentExcerpt}}...
+                    </div>
+                    
+                    {{if .Tags}}
+                    <div class="post-tags">
+                        {{range .Tags}}
+                        <span class="tag">#{{.}}</span>
+                        {{end}}
+                    </div>
+                    {{end}}
+                    
+                    <div class="post-stats">
+                        <span class="stat">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            {{.LikesCount}}
+                        </span>
+                        <span class="stat">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            {{.CommentsCount}} comments
+                        </span>
+                        <span class="stat">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            {{.ViewsCount}} views
+                        </span>
+                    </div>
+                </article>
+                {{end}}
+                
+                {{if not .Posts}}
+                <div class="no-posts">
+                    <h3>No posts found</h3>
+                    <p>{{if .IsAuthenticated}}Be the first to start a discussion!{{else}}Join the community to see and create discussions.{{end}}</p>
+                    {{if .IsAuthenticated}}
+                    <a href="/post/create" class="btn btn-primary">Create First Post</a>
+                    {{else}}
+                    <a href="/register" class="btn btn-primary">Join Community</a>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+
+            <!-- Pagination -->
+            {{if .Pagination}}
+            <div class="pagination">
+                {{if .Pagination.HasPrevious}}
+                <a href="?page={{.Pagination.PreviousPage}}{{if .Filter}}&filter={{.Filter}}{{end}}{{if .CategoryFilter}}&category={{.CategoryFilter}}{{end}}" class="page-btn">← Previous</a>
+                {{end}}
+                
+                <!-- Page numbers -->
+                {{$currentPage := .Pagination.CurrentPage}}
+                {{$totalPages := .Pagination.TotalPages}}
+                {{$filter := .Filter}}
+                {{$category := .CategoryFilter}}
+                
+                {{if gt $totalPages 1}}
+                <div class="page-numbers">
+                    {{if gt $currentPage 2}}
+                    <a href="?page=1{{if $filter}}&filter={{$filter}}{{end}}{{if $category}}&category={{$category}}{{end}}" class="page-number">1</a>
+                    {{if gt $currentPage 3}}
+                    <span class="page-ellipsis">...</span>
+                    {{end}}
+                    {{end}}
+                    
+                    {{if gt $currentPage 1}}
+                    <a href="?page={{sub $currentPage 1}}{{if $filter}}&filter={{$filter}}{{end}}{{if $category}}&category={{$category}}{{end}}" class="page-number">{{sub $currentPage 1}}</a>
+                    {{end}}
+                    
+                    <span class="page-number current">{{$currentPage}}</span>
+                    
+                    {{if lt $currentPage $totalPages}}
+                    <a href="?page={{add $currentPage 1}}{{if $filter}}&filter={{$filter}}{{end}}{{if $category}}&category={{$category}}{{end}}" class="page-number">{{add $currentPage 1}}</a>
+                    {{end}}
+                    
+                    {{if lt $currentPage (sub $totalPages 1)}}
+                    {{if lt $currentPage (sub $totalPages 2)}}
+                    <span class="page-ellipsis">...</span>
+                    {{end}}
+                    <a href="?page={{$totalPages}}{{if $filter}}&filter={{$filter}}{{end}}{{if $category}}&category={{$category}}{{end}}" class="page-number">{{$totalPages}}</a>
+                    {{end}}
+                </div>
+                {{end}}
+                
+                {{if .Pagination.HasNext}}
+                <a href="?page={{.Pagination.NextPage}}{{if .Filter}}&filter={{.Filter}}{{end}}{{if .CategoryFilter}}&category={{.CategoryFilter}}{{end}}" class="page-btn">Next →</a>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+    </main>
+    {{ template "elements/footer.html" . }}
+    
+    <script>
+        function filterByCategory(category) {
+            const currentUrl = new URL(window.location);
+            if (category) {
+                currentUrl.searchParams.set('category', category);
+            } else {
+                currentUrl.searchParams.delete('category');
+            }
+            // Reset to page 1 when changing category
+            currentUrl.searchParams.set('page', '1');
+            // Keep existing filter parameter
+            window.location.href = currentUrl.toString();
+        }
+    </script>
+</body>
+</html>
+{{end}}

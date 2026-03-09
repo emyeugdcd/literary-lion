@@ -1,0 +1,30 @@
+{{define "elements/header.html"}}
+<header>
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">
+        <a href="/">
+          <img src="../images/lionlogo.png" alt="lion logo" />
+        </a>
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+          {{if .IsAuthenticated}}
+          <li><a href="/createpost">Create Post!</a></li>
+          <li><a href="/posts">Join A Discussion!</a></li>
+          <li class="user-menu">
+            <span>Welcome, {{.CurrentUser.Username}}</span>
+            <a href="/profile/{{.CurrentUser.Username}}">Profile</a>
+            <a href="/logout">Logout</a>
+          </li>
+          {{else}}
+          <li><a href="/login">Login</a></li>
+          <li><a href="/register">Register</a></li>
+          {{end}}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+{{end}}

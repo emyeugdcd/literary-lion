@@ -1,0 +1,229 @@
+{{define "search.html"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Results - Literary Lions</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playwrite+RO:wght@100..400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/bookicon.png" />
+  </head>
+  <body>
+    {{ template "elements/header.html" . }}
+
+    <main>
+      <div class="container">
+        <!-- Search Form -->
+        <div class="search-container-main">
+          <form action="/search" method="get">
+            <div class="input-container-main">
+              <input
+                type="text"
+                id="search"
+                name="search"
+                placeholder="Search for a book, author, or topic..."
+                value="{{.Query}}"
+                required
+              />
+              <button type="submit" class="search-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </button>
+            </div>
+          </form>
+
+          <!-- Search suggestions dropdown (hidden by default) -->
+          <div
+            id="suggestions-dropdown"
+            class="suggestions-dropdown"
+            style="display: none"
+          >
+            <ul id="suggestions-list"></ul>
+          </div>
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results">
+          <div class="search-header">
+            <h1>Search Results</h1>
+            <div class="search-info">
+              {{if .Results}}
+              <p>
+                Found {{.TotalCount}} result(s) for
+                "<strong>{{.Query}}</strong>"
+              </p>
+              {{else}}
+              <p>No results found for "<strong>{{.Query}}</strong>"</p>
+              {{end}}
+            </div>
+          </div>
+
+          {{if .Results}}
+          <div class="results-container">
+            {{range .Results}}
+            <div class="result-item">
+              <div class="result-header">
+                <h3><a href="/post/{{.ID}}">{{.Title}}</a></h3>
+                <div class="result-meta">
+                  <span class="author">by {{.Username}}</span>
+                  <span class="separator">•</span>
+                  <span class="date">{{.CreatedAt.Format "Jan 2, 2006"}}</span>
+                  <span class="separator">•</span>
+                  <span class="views">{{.ViewsCount}} views</span>
+                </div>
+              </div>
+
+              <div class="result-content">
+                <p>{{.ContentExcerpt}}</p>
+              </div>
+
+              <div class="result-footer">
+                <div class="result-stats">
+                  <span class="likes">❤️ {{.LikesCount}}</span>
+                  <span class="comments">💬 {{.CommentsCount}}</span>
+                </div>
+
+                {{if .Tags}}
+                <div class="result-tags">
+                  {{range .Tags}}
+                  <span class="tag">{{.}}</span>
+                  {{end}}
+                </div>
+                {{end}}
+              </div>
+            </div>
+            {{end}}
+          </div>
+
+          <!-- Pagination -->
+          {{if gt .TotalPages 1}}
+          <div class="pagination">
+            {{if .HasPrev}}
+            <a
+              href="/search?search={{.Query}}&page={{sub .CurrentPage 1}}"
+              class="pagination-btn"
+              >← Previous</a
+            >
+            {{end}}
+
+            <span class="pagination-info">
+              Page {{.CurrentPage}} of {{.TotalPages}}
+            </span>
+
+            {{if .HasNext}}
+            <a
+              href="/search?search={{.Query}}&page={{add .CurrentPage 1}}"
+              class="pagination-btn"
+              >Next →</a
+            >
+            {{end}}
+          </div>
+          {{end}} {{else}}
+          <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h3>No posts found</h3>
+            <p>Try another search term or check for typos.</p>
+            <div class="search-suggestions">
+              <h4>Search tips:</h4>
+              <ul>
+                <li>Use different keywords</li>
+                <li>Try broader terms</li>
+                <li>Check spelling</li>
+                <li>Search for author names or book titles</li>
+              </ul>
+            </div>
+            <a href="/posts" class="btn btn-primary">Browse All Posts</a>
+          </div>
+          {{end}}
+        </div>
+      </div>
+    </main>
+
+    {{ template "elements/footer.html" . }}
+
+    <!-- <script>
+      // Auto-complete functionality
+      const searchInput = document.getElementById("search");
+      const suggestionsDropdown = document.getElementById(
+        "suggestions-dropdown"
+      );
+      const suggestionsList = document.getElementById("suggestions-list");
+
+      let searchTimeout;
+
+      searchInput.addEventListener("input", function (e) {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+
+        if (query.length < 2) {
+          suggestionsDropdown.style.display = "none";
+          return;
+        }
+
+        searchTimeout = setTimeout(() => {
+          fetch(`/api/suggestions?q=${encodeURIComponent(query)}`)
+            .then((response) => response.json())
+            .then((suggestions) => {
+              suggestionsList.innerHTML = "";
+
+              if (suggestions.length > 0) {
+                suggestions.forEach((suggestion) => {
+                  const li = document.createElement("li");
+                  li.textContent = suggestion;
+                  li.addEventListener("click", () => {
+                    searchInput.value = suggestion;
+                    suggestionsDropdown.style.display = "none";
+                    searchInput.form.submit();
+                  });
+                  suggestionsList.appendChild(li);
+                });
+                suggestionsDropdown.style.display = "block";
+              } else {
+                suggestionsDropdown.style.display = "none";
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching suggestions:", error);
+              suggestionsDropdown.style.display = "none";
+            });
+        }, 300);
+      });
+
+      // Hide suggestions when clicking outside
+      document.addEventListener("click", function (e) {
+        if (
+          !searchInput.contains(e.target) &&
+          !suggestionsDropdown.contains(e.target)
+        ) {
+          suggestionsDropdown.style.display = "none";
+        }
+      });
+
+      // Handle keyboard navigation
+      searchInput.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          suggestionsDropdown.style.display = "none";
+        }
+      });
+    </script> -->
+  </body>
+</html>
+{{end}}

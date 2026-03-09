@@ -1,0 +1,297 @@
+{{define "post_detail.html"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Post.Title}} - Literary Lions</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/post-detail.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playwrite+RO:wght@100..400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/bookicon.png" />
+  </head>
+  <body>
+    {{ template "elements/header.html" . }}
+    <main>
+      <div class="container">
+        <div class="post-detail-container">
+          <div class="post-main-content">
+            <!-- Breadcrumb Navigation -->
+            <nav class="breadcrumb">
+              <a href="/">Home</a>
+              <span class="separator">→</span>
+              <a href="/posts?category={{.Post.Category}}">{{.Post.CategoryName}}</a>
+              <span class="separator">→</span>
+              <span class="current">{{.Post.Title}}</span>
+            </nav>
+
+          <!-- Main Post -->
+          <article class="post-main">
+            <header class="post-header">
+              <div class="post-category">
+                <span class="category-badge category-{{.Post.Category}}"
+                  >{{.Post.CategoryName}}</span
+                >
+              </div>
+
+              <h1 class="post-title">{{.Post.Title}}</h1>
+
+              {{if .Post.Title}}
+              <div class="post-book-info">
+                <span class="book-icon">📚</span>
+                <strong>{{.Post.Title}}</strong>
+                {{if .Post.Username}}<span class="book-author"
+                  >by {{.Post.Username}}</span
+                >{{end}}
+              </div>
+              {{end}}
+
+              <div class="post-meta">
+                <div class="author-info">
+                  <img
+                    src="/images/placeholder.jpg"
+                    alt="{{.Post.Username}}"
+                    class="author-avatar"
+                  />
+                  <div class="author-details">
+                    <a href="/user/{{.Post.UserID}}" class="author-name"
+                      >{{.Post.Username}}</a
+                    >
+                    <span class="post-date"
+                      >{{.Post.CreatedAt.Format "January 2, 2006 at 3:04PM"}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <div class="post-content">{{.Post.Content}}</div>
+            {{if .Post.Tags}}
+            <div class="post-tags">
+              {{range .Post.Tags}}
+              <span class="tag">#{{.}}</span>
+              {{end}}
+            </div>
+            {{end}}
+
+            <div class="post-actions">
+              {{if .CurrentUser}}
+              <form action="/post/like/{{.Post.ID}}" method="post" style="display: inline;">
+                <button
+                  type="submit"
+                  class="action-btn like-btn {{if .HasLiked}}liked{{end}}"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    ></path>
+                  </svg>
+                  <span class="like-count">{{.Post.LikesCount}}</span>
+                </button>
+              </form>
+              {{else}}
+              <span class="action-btn like-btn disabled">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  ></path>
+                </svg>
+                <span class="like-count">{{.Post.LikesCount}}</span>
+              </span>
+              {{end}}
+
+            </div>
+          </article>
+
+          <!-- Comments Section -->
+          <section class="comments-section">
+            <h2 class="comments-title">Discussion ({{len .Comments}})</h2>
+
+            {{if .CurrentUser}}
+            <!-- Comment Form -->
+            <div class="comment-form-container">
+              <form
+                action="/post/comment/{{.Post.ID}}"
+                method="post"
+                class="comment-form"
+              >
+                <div class="comment-form-header">
+                  <img
+                    src="/images/placeholder.jpg"
+                    alt="{{.CurrentUser.Username}}"
+                    class="comment-avatar"
+                  />
+                  <span class="comment-author">{{.CurrentUser.Username}}</span>
+                </div>
+                <textarea
+                  name="content"
+                  placeholder="Join the discussion... Share your thoughts respectfully"
+                  required
+                  minlength="10"
+                  rows="4"
+                  id="comment-textarea"
+                ></textarea>
+                <div class="comment-form-actions">
+                  <button type="submit" class="btn btn-primary">
+                    Post Comment
+                  </button>
+                </div>
+              </form>
+            </div>
+            {{else}}
+            <div class="auth-prompt">
+              <p>
+                <a href="/login">Sign in</a> or
+                <a href="/register">create an account</a> to join the
+                discussion.
+              </p>
+            </div>
+            {{end}}
+
+            <!-- Comments List -->
+            <div class="comments-list">
+              {{range .Comments}}
+              <div class="comment" data-comment-id="{{.ID}}">
+                <div class="comment-header">
+                  <img
+                    src="/images/placeholder.jpg"
+                    alt="{{.Username}}"
+                    class="comment-avatar"
+                  />
+                  <div class="comment-meta">
+                    <a href="/user/{{.UserID}}" class="comment-author"
+                      >{{.Username}}</a
+                    >
+                    <span class="comment-date"
+                      >{{.Time.Format "January 2, 2006 at 3:04 PM"}}</span
+                    >
+                  </div>
+                </div>
+
+                <div class="comment-content">{{.Content}}</div>
+
+                <div class="comment-actions">
+                  {{if $.CurrentUser}}
+                  <form action="/comment/like/{{.ID}}" method="post" style="display: inline;">
+                    <button
+                      type="submit"
+                      class="comment-action like-comment"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path
+                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                        ></path>
+                      </svg>
+                      <span class="like-count">{{len .Likes}}</span>
+                    </button>
+                  </form>
+                  {{else}}
+                  <span class="comment-action like-comment disabled">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                      ></path>
+                    </svg>
+                    <span class="like-count">{{len .Likes}}</span>
+                  </span>
+                  {{end}}
+
+                  {{if $.CurrentUser}}
+                  <button
+                    class="comment-action reply-comment"
+                    onclick="focusCommentForm()"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M3 10h10a8 8 0 0 1 8 8v2M3 10l6 6m-6-6l6-6"
+                      ></path>
+                    </svg>
+                    Reply
+                  </button>
+                  {{end}}
+                </div>
+
+                <!-- Nested replies feature not implemented yet -->
+              </div>
+              {{end}} {{if not .Comments}}
+              <div class="no-comments">
+                <p>No comments yet. Be the first to share your thoughts!</p>
+              </div>
+              {{end}}
+            </div>
+          </section>
+          </div>
+
+        <!-- Sidebar -->
+        <aside class="post-sidebar">
+          <div class="sidebar-section">
+            <h3>Related Discussions</h3>
+            <div class="related-posts">
+              {{range .RelatedPosts}}
+              <a href="/post/{{.ID}}" class="related-post">
+                <h4>{{.Title}}</h4>
+                <span class="related-meta"
+                  >{{.Username}} • {{.CreatedAt.Format "Jan 2"}}</span
+                >
+              </a>
+              {{end}}
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <h3>Popular Tags</h3>
+            <div class="popular-tags">
+              {{range .PopularTags}}
+              <a href="/tag/{{.}}" class="popular-tag">#{{.}}</a>
+              {{end}}
+            </div>
+          </div>
+        </aside>
+        </div>
+      </div>
+    </main>
+    {{ template "elements/footer.html" . }}
+
+  </body>
+</html>
+{{end}}

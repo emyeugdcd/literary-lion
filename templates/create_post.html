@@ -1,0 +1,133 @@
+{{define "create_post.html"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create New Post - Literary Lions</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Playwrite+RO:wght@100..400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="/images/bookicon.png" />
+  </head>
+  <body>
+    {{ template "elements/header.html" . }}
+    <main>
+      <div class="container">
+        <div class="post-form-container">
+          <div class="post-form-header">
+            <h1>Roar Out Loud</h1>
+            <p>Start a new discussion and connect with fellow lions</p>
+          </div>
+
+          {{if .Error}}
+          <div class="error-message">{{.Error}}</div>
+          {{end}}
+
+          <form action="/createpost" method="POST" class="create-post-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="title">Discussion Title</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value="{{.Title}}"
+                  placeholder="What's your topic? (e.g., 'Recommended Books for Pride Months?')"
+                  required
+                  maxlength="200"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                  <option value="">Select a category...</option>
+                  <option value="book-review" {{if eq .CategoryStr "book-review"}}selected{{end}}>Book Review</option>
+                  <option value="book-recommendation" {{if eq .CategoryStr "book-recommendation"}}selected{{end}}>Book Recommendation</option>
+                  <option value="author-discussion" {{if eq .CategoryStr "author-discussion"}}selected{{end}}>Author Discussion</option>
+                  <option value="reading-challenge" {{if eq .CategoryStr "reading-challenge"}}selected{{end}}>Reading Challenge</option>
+                  <option value="book-club" {{if eq .CategoryStr "book-club"}}selected{{end}}>Book Club</option>
+                  <option value="writing-tips" {{if eq .CategoryStr "writing-tips"}}selected{{end}}>Writing Tips</option>
+                  <option value="genre-discussion" {{if eq .CategoryStr "genre-discussion"}}selected{{end}}>Genre Discussion</option>
+                  <option value="general" {{if eq .CategoryStr "general"}}selected{{end}}>General Discussion</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="book_title">Book Title (Optional)</label>
+              <input
+                type="text"
+                id="book_title"
+                name="book_title"
+                value="{{.BookTitle}}"
+                placeholder="Which book are you discussing?"
+                maxlength="100"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="author">Author (Optional)</label>
+              <input
+                type="text"
+                id="author"
+                name="author"
+                value="{{.Author}}"
+                placeholder="Book author's name"
+                maxlength="100"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="content">Your Discussion</label>
+              <textarea
+                id="content"
+                name="content"
+                placeholder="Share your thoughts, ask questions, start a discussion... Be respectful and engaging!"
+                required
+                minlength="50"
+                rows="12"
+              >{{.Content}}</textarea>
+              <div class="character-count">
+                <small>Minimum 50 characters required</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tags">Tags (Optional)</label>
+              <input
+                type="text"
+                id="tags"
+                name="tags"
+                value="{{join .Tags ", "}}"
+                placeholder="Add tags separated by commas (e.g., fantasy, romance, must-read)"
+                maxlength="200"
+              />
+              <small class="form-help">Help others find your post with relevant tags</small>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="history.back()"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Publish Post
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+    {{ template "elements/footer.html" . }}
+  </body>
+</html>
+{{end}}
